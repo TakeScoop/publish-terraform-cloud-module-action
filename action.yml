@@ -1,11 +1,26 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: Terraform Register Module Action
+description: This action registers a Terraform module using VCS with a Terraform Cloud registry
+author: takescoop
 inputs:
-  milliseconds: # change this
+  repo:
+    description: The repository to register
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  tf-organization: 
+    description: The Terraform organization
+    required: true
+  tf-token:
+    description: A Terraform token capable of making module registry API request
+    required: true
+  tf-host:
+    description: Terraform API domain name
+    default: app.terraform.io
+  vcs-token-id: 
+    description:  Token ID of the Terraform VCS client to register the repository with (takes precedence over vcs-name)
+  vcs-name:
+    description: Name of the Terraform Cloud VCS client to register the repository with (not used if vcs-token-id is passed)
+outputs:
+  module:
+    description: JSON module representation returned from the Terraform API
 runs:
   using: 'node12'
   main: 'dist/index.js'

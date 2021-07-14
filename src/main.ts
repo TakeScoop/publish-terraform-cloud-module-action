@@ -1,19 +1,26 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {register} from './register'
+import {terraform, TerraformOptions, TerraformInstance} from './lib/terraform'
 
-async function run(): Promise<void> {
+async function main(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const module = await register(
+      {
+        repo: core.getInput('repo'),
+        organization: core.getInput('tf-organization'),
+        vcsTokenID: core.getInput('vcs-token-id'),
+        vcsName: core.getInput('vcs-name')
+      },
+      terraform({
+        token: core.getInput('tf-token'),
+        host: core.getInput('tf-host')
+      } as TerraformOptions) as TerraformInstance
+    )
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('module', JSON.stringify(module))
   } catch (error) {
     core.setFailed(error.message)
   }
 }
 
-run()
+main()
