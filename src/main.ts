@@ -1,20 +1,21 @@
 import * as core from '@actions/core'
-import {register} from './register'
-import {terraform, TerraformOptions, TerraformInstance} from './lib/terraform'
+import {publish} from './publish'
+import * as terraform from './lib/terraform'
 
 async function main(): Promise<void> {
   try {
-    const module = await register(
+    const module = await publish(
       {
         repo: core.getInput('repo'),
+        displayIdentifier: core.getInput('display-identifier'),
         organization: core.getInput('tf-organization'),
         vcsTokenID: core.getInput('vcs-token-id'),
         vcsName: core.getInput('vcs-name')
       },
-      terraform({
+      terraform.Client({
         token: core.getInput('tf-token'),
         host: core.getInput('tf-host')
-      } as TerraformOptions) as TerraformInstance
+      } as terraform.ClientOptions) as terraform.ClientInstance
     )
 
     core.setOutput('module', JSON.stringify(module))

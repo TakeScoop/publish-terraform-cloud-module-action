@@ -1,26 +1,30 @@
-name: Terraform Register Module Action
-description: This action registers a Terraform module using VCS with a Terraform Cloud registry
+name: Publish Terraform Cloud Module Action
+description: This action creates a new private module in Terraform Cloud with a VCS connection to the current repository, if one does not already exist
 author: takescoop
 inputs:
   repo:
-    description: The repository to register
-    required: true
+    description: The repository to publish. Format `owner/name`
+    default: ${{ github.repository }}
+  display-identifier:
+    description: The display identifier for the repository
+    default: ${{ github.repository }}
   tf-organization: 
-    description: The Terraform organization
+    description: The Terraform Cloud organization name
     required: true
   tf-token:
-    description: A Terraform token capable of making module registry API request
+    description: A Terraform Cloud API token
     required: true
   tf-host:
-    description: Terraform API domain name
+    description: The Terraform Cloud hostname
     default: app.terraform.io
   vcs-token-id: 
-    description:  Token ID of the Terraform VCS client to register the repository with (takes precedence over vcs-name)
+    description: Token ID of the Terraform Cloud VCS client used in the VCS connection (overrides vcs-name)
   vcs-name:
-    description: Name of the Terraform Cloud VCS client to register the repository with (not used if vcs-token-id is passed)
+    description: Name of the Terraform Cloud VCS client for the repository (not used if vcs-token-id is passed)
+    default: GitHub.com
 outputs:
   module:
-    description: JSON module representation returned from the Terraform API
+    description: Reference to the published module
 runs:
   using: 'node12'
   main: 'dist/index.js'

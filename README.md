@@ -1,4 +1,4 @@
-# Terraform Register Module Action
+# Publish Terraform Cloud Module Action
 
 This action creates a new private module in Terraform Cloud with a VCS connection to the current repository, if one does not already exist.
 
@@ -8,24 +8,23 @@ This action creates a new private module in Terraform Cloud with a VCS connectio
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: takescoop/terraform-register-module-action@v1
+      - uses: takescoop/publish-terraform-cloud-module-action@v1
         with:
-          repo: "${{ github.repository }}"
           tf-organization: takescoop
           tf-token: "${{ secrets.TF_TOKEN }}"
-          vcs-name: Github
 ```
 
 ### Action inputs
 
 | Name | Description | Default |
 | --- | --- | --- |
-| `repo` | (Required) The repository to register. Format: `owner/name` ||
+| `repo` | (Required) The repository to publish. Format: `owner/name` | `${{github.repository}}` |
 | `tf-organization` | (Required) The Terraform Cloud organization name ||
 | `tf-token` | (Required) A Terraform Cloud API token ||
 | `tf-host` | The Terraform Cloud hostname | `app.terraform.io` |
 | `vcs-token-id` | Token ID of the Terraform Cloud VCS client used in the VCS connection (overrides vcs-name) ||
-| `vcs-name` | Name of the Terraform Cloud VCS client for the repository ||
+| `vcs-name` | Name of the Terraform Cloud VCS client for the repository (not used if vcs-token-id is passed) | `GitHub.com` |
+| `display-identifier` | 	The display identifier for the repository | `${{github.repository}}` |
 
 ## Releasing
 

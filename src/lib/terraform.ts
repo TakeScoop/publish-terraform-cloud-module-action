@@ -1,16 +1,18 @@
+import * as path from 'path'
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios'
 
-export interface TerraformOptions {
+export interface ClientOptions {
   token: string,
-  host: string,
+  host?: string,
+  version?: string
 }
 
-export {AxiosInstance as TerraformInstance}
-export {AxiosResponse as TerraformResponse}
+export {AxiosInstance as ClientInstance}
+export {AxiosResponse as ClientResponse}
 
-export function terraform ({ token, host = 'app.terraform.io' } : TerraformOptions): AxiosInstance {
+export function Client ({ token, host = 'app.terraform.io', version='/api/v2' }: ClientOptions): AxiosInstance {
   return axios.create({
-    baseURL: `https://${host}`,
+    baseURL: `https://${path.join(host, version)}`,
     headers: {
       'Content-Type': 'application/vnd.api+json',
       Authorization: `Bearer ${token}`,
