@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {publish} from './publish'
 import * as terraform from './lib/terraform'
 
-async function main(): Promise<void> {
+async function run(): Promise<void> {
   try {
     const module = await publish(
       {
@@ -24,4 +24,4 @@ async function main(): Promise<void> {
   }
 }
 
-main()
+run()
