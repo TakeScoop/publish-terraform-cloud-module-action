@@ -7,8 +7,8 @@ export interface ClientOptions {
   version?: string
 }
 
-export interface ClientInstance extends AxiosInstance {}
-export interface ClientResponse extends AxiosResponse {}
+export type ClientInstance = AxiosInstance
+export type ClientResponse = AxiosResponse
 
 export function Client ({ token, host = 'app.terraform.io', version='/api/v2' }: ClientOptions): ClientInstance {
   return axios.create({
