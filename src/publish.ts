@@ -135,5 +135,6 @@ export async function publish(
   module.link = `${origin}/app/${organization}/registry/modules/private/${module.namespace}/${module.name}/${module.provider}`
 
   core.info(module.link)
+  
   return module
 }

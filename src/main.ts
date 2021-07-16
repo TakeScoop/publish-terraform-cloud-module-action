@@ -15,7 +15,7 @@ async function main(): Promise<void> {
       terraform.Client({
         token: core.getInput('tf-token'),
         host: core.getInput('tf-host')
-      } as terraform.ClientOptions) as terraform.ClientInstance
+      } as terraform.ClientOptions)
     )
 
     core.setOutput('module', JSON.stringify(module))
