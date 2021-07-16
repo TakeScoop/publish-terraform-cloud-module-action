@@ -2,7 +2,7 @@
   "name": "publish-terraform-cloud-module-action",
   "version": "0.0.0",
   "private": false,
-  "description": "Publishes a Terraform module repositories with a Terraform Cloud module registry",
+  "description": "Publishes a Terraform module to a Terraform Cloud module registry",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",

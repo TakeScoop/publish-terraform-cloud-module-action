@@ -18,13 +18,13 @@ This action creates a new private module in Terraform Cloud with a VCS connectio
 
 | Name | Description | Default |
 | --- | --- | --- |
-| `repo` | (Required) The repository to publish. Format: `owner/name` | `${{github.repository}}` |
 | `tf-organization` | (Required) The Terraform Cloud organization name ||
 | `tf-token` | (Required) A Terraform Cloud API token ||
+| `repo` | The repository to publish. Format: `owner/name` | `${{github.repository}}` |
+| `display-identifier` | 	The display identifier for the repository | `${{github.repository}}` |
 | `tf-host` | The Terraform Cloud hostname | `app.terraform.io` |
 | `vcs-token-id` | Token ID of the Terraform Cloud VCS client used in the VCS connection (overrides vcs-name) ||
 | `vcs-name` | Name of the Terraform Cloud VCS client for the repository (not used if vcs-token-id is passed) | `GitHub.com` |
-| `display-identifier` | 	The display identifier for the repository | `${{github.repository}}` |
 
 ## Releasing
 
