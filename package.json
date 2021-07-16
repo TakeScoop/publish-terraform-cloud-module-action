@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "publish-terraform-cloud-module-action",
   "version": "0.0.0",
-  "private": true,
-  "description": "TypeScript template action",
+  "private": false,
+  "description": "Publishes a Terraform module to a Terraform Cloud module registry",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -15,17 +15,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/takescoop/publish-terraform-cloud-module-action.git"
   },
   "keywords": [
-    "actions",
     "node",
-    "setup"
+    "terraform"
   ],
-  "author": "",
+  "author": "takescoop",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.2.6"
+    "@actions/core": "^1.4.0",
+    "axios": "^0.21.1"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",
@@ -38,6 +38,7 @@
     "jest": "^26.6.3",
     "jest-circus": "^26.6.3",
     "js-yaml": "^3.14.0",
+    "nock": "^13.1.1",
     "prettier": "2.2.1",
     "ts-jest": "^26.4.4",
     "typescript": "^4.1.3"

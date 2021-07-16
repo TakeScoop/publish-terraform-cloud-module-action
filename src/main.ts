@@ -1,16 +1,24 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import {publish} from './publish'
+import * as terraform from './lib/terraform'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
+    const module = await publish(
+      {
+        repo: core.getInput('repo'),
+        displayIdentifier: core.getInput('display-identifier'),
+        organization: core.getInput('tf-organization'),
+        vcsTokenID: core.getInput('vcs-token-id'),
+        vcsName: core.getInput('vcs-name')
+      },
+      terraform.Client({
+        token: core.getInput('tf-token'),
+        host: core.getInput('tf-host')
+      } as terraform.ClientOptions)
+    )
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
-
-    core.setOutput('time', new Date().toTimeString())
+    core.setOutput('module', JSON.stringify(module))
   } catch (error) {
     core.setFailed(error.message)
   }
