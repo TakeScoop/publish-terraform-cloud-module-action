@@ -89,19 +89,28 @@ export async function publish(
   const tokenID =
     vcsTokenID || (await lookupVCSTokenID(tf, organization, vcsName!))
 
-  const published = await tf({
-    url: `/organizations/${organization}/registry-modules`,
-    method: 'get',
-    params: {
-      filter: `identifier=${repo}`
+  let mod: ModuleResponseData | null = null
+
+  const [, repoName] = repo.split('/')
+  const [, provider, ...nameParts] = repoName.split('-')
+  const name = nameParts.join('-')
+
+  try {
+    const published = await tf({
+      url: `/organizations/${organization}/registry-modules/private/${organization}/${name}/${provider}`,
+      method: 'get'
+    })
+
+    mod = published.data.data as ModuleResponseData
+  } catch (err) {
+    if (err.response.status !== 404) {
+      throw err
     }
-  })
+  }
 
-  let rawModule: ModuleResponseData = published.data.data[0]
-
-  if (!rawModule) {
+  if (!mod) {
     try {
-      rawModule = (
+      mod = (
         await tf({
           url: `/organizations/${organization}/registry-modules/vcs`,
           method: 'post',
@@ -112,7 +121,7 @@ export async function publish(
                 vcs_repo: {
                   identifier: repo,
                   'oauth-token-id': tokenID,
-                  display_identifier: displayIdentifier,
+                  display_identifier: displayIdentifier
                 }
               }
             }
@@ -120,21 +129,25 @@ export async function publish(
         })
       ).data.data as ModuleResponseData
 
-      core.info(`Module "${rawModule.attributes.name}" from repository "${repo}" was published.`)
+      core.info(
+        `Module "${mod.attributes.name}" from repository "${repo}" was published.`
+      )
     } catch (err) {
       core.error(JSON.stringify(err.response.data))
       throw err
     }
   } else {
-    core.info(`No action. Module "${rawModule.attributes.name}" from repository "${repo}" was already published.`)
+    core.info(
+      `No action. Module "${mod.attributes.name}" from repository "${repo}" was already published.`
+    )
   }
 
-  const module = newModuleFromResponse(rawModule)
+  const module = newModuleFromResponse(mod)
 
   const {origin} = new URL(tf.defaults.baseURL as string)
   module.link = `${origin}/app/${organization}/registry/modules/private/${module.namespace}/${module.name}/${module.provider}`
 
   core.info(module.link)
-  
+
   return module
 }
