@@ -1,6 +1,6 @@
 {
   "name": "publish-terraform-cloud-module-action",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "Publishes a Terraform module to a Terraform Cloud module registry",
   "main": "lib/main.js",
