@@ -45,7 +45,7 @@ test('Should publish the passed repository', async () => {
   }
 
   nock(`https://fake.terraform.io`)
-    .get(`/api/v2/organizations/org/oauth-clients`)
+    .get('/api/v2/organizations/org/oauth-clients')
     .reply(200, {
       data: [
         {
@@ -56,13 +56,11 @@ test('Should publish the passed repository', async () => {
         }
       ]
     })
-    .get(`/api/v2/oauth-clients/123/oauth-tokens`)
+    .get('/api/v2/oauth-clients/123/oauth-tokens')
     .reply(200, {data: [{id: '456'}]})
-    .get(
-      `/api/v2/organizations/org/registry-modules?filter=identifier%3Dorg%2Fterraform-unit-test`
-    )
-    .reply(200, {data: []})
-    .post(`/api/v2/organizations/org/registry-modules/vcs`)
+    .get('/api/v2/organizations/org/registry-modules/private/org/test/unit')
+    .reply(404, {response: {status: 404}})
+    .post('/api/v2/organizations/org/registry-modules/vcs')
     .reply(200, {
       data: {
         id: 'mod-123',
@@ -158,24 +156,20 @@ test('Should return the published repo if it has already been published', async 
         }
       ]
     })
-    .get(
-      `/api/v2/organizations/org/registry-modules?filter=identifier%3Dorg%2Fterraform-unit-test`
-    )
+    .get('/api/v2/organizations/org/registry-modules/private/org/test/unit')
     .reply(200, {
-      data: [
-        {
-          id: 'mod-123',
-          attributes: {
-            name: 'test',
-            namespace: 'org',
-            provider: 'terraform',
-            'vcs-repo': {
-              identifier: 'org/terraform-unit-test',
-              'display-identifier': 'org/terraform-unit-test'
-            }
+      data: {
+        id: 'mod-123',
+        attributes: {
+          name: 'test',
+          namespace: 'org',
+          provider: 'terraform',
+          'vcs-repo': {
+            identifier: 'org/terraform-unit-test',
+            'display-identifier': 'org/terraform-unit-test'
           }
         }
-      ]
+      }
     })
 
   await expect(
@@ -205,10 +199,8 @@ test('Should use the VCS token ID directly if passed', async () => {
   }
 
   nock(`https://fake.terraform.io`)
-    .get(
-      `/api/v2/organizations/org/registry-modules?filter=identifier%3Dorg%2Fterraform-unit-test`
-    )
-    .reply(200, {data: []})
+    .get('/api/v2/organizations/org/registry-modules/private/org/test/unit')
+    .reply(404, {response: {status: 404}})
     .post(`/api/v2/organizations/org/registry-modules/vcs`)
     .reply(200, {
       data: {
