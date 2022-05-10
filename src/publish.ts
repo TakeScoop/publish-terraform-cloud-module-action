@@ -134,7 +134,7 @@ export async function publish(
         `Module "${mod.attributes.name}" from repository "${repo}" was published.`
       )
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response)
+      if (axios.isAxiosError(err) && err.response) {
         core.error(JSON.stringify(err.response.data))
       }
 
