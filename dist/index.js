@@ -8,7 +8,11 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -53,7 +57,11 @@ exports.Client = Client;
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -86,7 +94,7 @@ const terraform = __importStar(__nccwpck_require__(6744));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const module = yield publish_1.publish({
+            const module = yield (0, publish_1.publish)({
                 repo: core.getInput('repo'),
                 displayIdentifier: core.getInput('display-identifier'),
                 organization: core.getInput('tf-organization'),
@@ -98,8 +106,8 @@ function run() {
             }));
             core.setOutput('module', JSON.stringify(module));
         }
-        catch (error) {
-            core.setFailed(error.message);
+        catch (err) {
+            core.setFailed(err);
         }
     });
 }
@@ -115,7 +123,11 @@ run();
 
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -141,9 +153,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.publish = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const axios_1 = __importDefault(__nccwpck_require__(6545));
 const url_1 = __nccwpck_require__(7310);
 function lookupVCSTokenID(tf, organization, vcsName) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -176,6 +192,7 @@ function newModuleFromResponse({ id, attributes: { name, namespace, provider, ['
     };
 }
 function publish({ organization, repo, vcsTokenID, vcsName, displayIdentifier }, tf) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         const tokenID = vcsTokenID || (yield lookupVCSTokenID(tf, organization, vcsName));
         let mod = null;
@@ -190,7 +207,7 @@ function publish({ organization, repo, vcsTokenID, vcsName, displayIdentifier },
             mod = published.data.data;
         }
         catch (err) {
-            if (err.response.status !== 404) {
+            if (axios_1.default.isAxiosError(err) && ((_a = err.response) === null || _a === void 0 ? void 0 : _a.status) !== 404) {
                 throw err;
             }
         }
@@ -215,7 +232,9 @@ function publish({ organization, repo, vcsTokenID, vcsName, displayIdentifier },
                 core.info(`Module "${mod.attributes.name}" from repository "${repo}" was published.`);
             }
             catch (err) {
-                core.error(JSON.stringify(err.response.data));
+                if (axios_1.default.isAxiosError(err) && err.response) {
+                    core.error(JSON.stringify(err.response.data));
+                }
                 throw err;
             }
         }
@@ -4697,12 +4716,21 @@ CombinedStream.prototype._emitError = function(err) {
  * This is the web browser implementation of `debug()`.
  */
 
-exports.log = log;
 exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
 exports.storage = localstorage();
+exports.destroy = (() => {
+	let warned = false;
+
+	return () => {
+		if (!warned) {
+			warned = true;
+			console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+		}
+	};
+})();
 
 /**
  * Colors.
@@ -4863,18 +4891,14 @@ function formatArgs(args) {
 }
 
 /**
- * Invokes `console.log()` when available.
- * No-op when `console.log` is not a "function".
+ * Invokes `console.debug()` when available.
+ * No-op when `console.debug` is not a "function".
+ * If `console.debug` is not available, falls back
+ * to `console.log`.
  *
  * @api public
  */
-function log(...args) {
-	// This hackery is required for IE8/9, where
-	// the `console.log` function doesn't have 'apply'
-	return typeof console === 'object' &&
-		console.log &&
-		console.log(...args);
-}
+exports.log = console.debug || console.log || (() => {});
 
 /**
  * Save `namespaces`.
@@ -4976,15 +5000,11 @@ function setup(env) {
 	createDebug.enable = enable;
 	createDebug.enabled = enabled;
 	createDebug.humanize = __nccwpck_require__(900);
+	createDebug.destroy = destroy;
 
 	Object.keys(env).forEach(key => {
 		createDebug[key] = env[key];
 	});
-
-	/**
-	* Active `debug` instances.
-	*/
-	createDebug.instances = [];
 
 	/**
 	* The currently active debug mode names, and names to skip.
@@ -5002,7 +5022,7 @@ function setup(env) {
 
 	/**
 	* Selects a color for a debug namespace
-	* @param {String} namespace The namespace string for the for the debug instance to be colored
+	* @param {String} namespace The namespace string for the debug instance to be colored
 	* @return {Number|String} An ANSI color code for the given namespace
 	* @api private
 	*/
@@ -5027,6 +5047,9 @@ function setup(env) {
 	*/
 	function createDebug(namespace) {
 		let prevTime;
+		let enableOverride = null;
+		let namespacesCache;
+		let enabledCache;
 
 		function debug(...args) {
 			// Disabled?
@@ -5056,7 +5079,7 @@ function setup(env) {
 			args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
 				// If we encounter an escaped % then don't increase the array index
 				if (match === '%%') {
-					return match;
+					return '%';
 				}
 				index++;
 				const formatter = createDebug.formatters[format];
@@ -5079,31 +5102,36 @@ function setup(env) {
 		}
 
 		debug.namespace = namespace;
-		debug.enabled = createDebug.enabled(namespace);
 		debug.useColors = createDebug.useColors();
-		debug.color = selectColor(namespace);
-		debug.destroy = destroy;
+		debug.color = createDebug.selectColor(namespace);
 		debug.extend = extend;
-		// Debug.formatArgs = formatArgs;
-		// debug.rawLog = rawLog;
+		debug.destroy = createDebug.destroy; // XXX Temporary. Will be removed in the next major release.
 
-		// env-specific initialization logic for debug instances
+		Object.defineProperty(debug, 'enabled', {
+			enumerable: true,
+			configurable: false,
+			get: () => {
+				if (enableOverride !== null) {
+					return enableOverride;
+				}
+				if (namespacesCache !== createDebug.namespaces) {
+					namespacesCache = createDebug.namespaces;
+					enabledCache = createDebug.enabled(namespace);
+				}
+
+				return enabledCache;
+			},
+			set: v => {
+				enableOverride = v;
+			}
+		});
+
+		// Env-specific initialization logic for debug instances
 		if (typeof createDebug.init === 'function') {
 			createDebug.init(debug);
 		}
 
-		createDebug.instances.push(debug);
-
 		return debug;
-	}
-
-	function destroy() {
-		const index = createDebug.instances.indexOf(this);
-		if (index !== -1) {
-			createDebug.instances.splice(index, 1);
-			return true;
-		}
-		return false;
 	}
 
 	function extend(namespace, delimiter) {
@@ -5121,6 +5149,7 @@ function setup(env) {
 	*/
 	function enable(namespaces) {
 		createDebug.save(namespaces);
+		createDebug.namespaces = namespaces;
 
 		createDebug.names = [];
 		createDebug.skips = [];
@@ -5138,15 +5167,10 @@ function setup(env) {
 			namespaces = split[i].replace(/\*/g, '.*?');
 
 			if (namespaces[0] === '-') {
-				createDebug.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+				createDebug.skips.push(new RegExp('^' + namespaces.slice(1) + '$'));
 			} else {
 				createDebug.names.push(new RegExp('^' + namespaces + '$'));
 			}
-		}
-
-		for (i = 0; i < createDebug.instances.length; i++) {
-			const instance = createDebug.instances[i];
-			instance.enabled = createDebug.enabled(instance.namespace);
 		}
 	}
 
@@ -5222,6 +5246,14 @@ function setup(env) {
 		return val;
 	}
 
+	/**
+	* XXX DO NOT USE. This is a temporary stub function.
+	* XXX It WILL be removed in the next major release.
+	*/
+	function destroy() {
+		console.warn('Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.');
+	}
+
 	createDebug.enable(createDebug.load());
 
 	return createDebug;
@@ -5269,6 +5301,10 @@ exports.formatArgs = formatArgs;
 exports.save = save;
 exports.load = load;
 exports.useColors = useColors;
+exports.destroy = util.deprecate(
+	() => {},
+	'Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.'
+);
 
 /**
  * Colors.
@@ -5498,7 +5534,9 @@ const {formatters} = module.exports;
 formatters.o = function (v) {
 	this.inspectOpts.colors = this.useColors;
 	return util.inspect(v, this.inspectOpts)
-		.replace(/\s*\n\s*/g, ' ');
+		.split('\n')
+		.map(str => str.trim())
+		.join(' ');
 };
 
 /**
@@ -6254,12 +6292,12 @@ module.exports.wrap = wrap;
 
 "use strict";
 
-module.exports = (flag, argv) => {
-	argv = argv || process.argv;
+
+module.exports = (flag, argv = process.argv) => {
 	const prefix = flag.startsWith('-') ? '' : (flag.length === 1 ? '-' : '--');
-	const pos = argv.indexOf(prefix + flag);
-	const terminatorPos = argv.indexOf('--');
-	return pos !== -1 && (terminatorPos === -1 ? true : pos < terminatorPos);
+	const position = argv.indexOf(prefix + flag);
+	const terminatorPosition = argv.indexOf('--');
+	return position !== -1 && (terminatorPosition === -1 || position < terminatorPosition);
 };
 
 
@@ -6654,23 +6692,32 @@ function plural(ms, msAbs, n, name) {
 "use strict";
 
 const os = __nccwpck_require__(2037);
+const tty = __nccwpck_require__(6224);
 const hasFlag = __nccwpck_require__(1621);
 
-const env = process.env;
+const {env} = process;
 
 let forceColor;
 if (hasFlag('no-color') ||
 	hasFlag('no-colors') ||
-	hasFlag('color=false')) {
-	forceColor = false;
+	hasFlag('color=false') ||
+	hasFlag('color=never')) {
+	forceColor = 0;
 } else if (hasFlag('color') ||
 	hasFlag('colors') ||
 	hasFlag('color=true') ||
 	hasFlag('color=always')) {
-	forceColor = true;
+	forceColor = 1;
 }
+
 if ('FORCE_COLOR' in env) {
-	forceColor = env.FORCE_COLOR.length === 0 || parseInt(env.FORCE_COLOR, 10) !== 0;
+	if (env.FORCE_COLOR === 'true') {
+		forceColor = 1;
+	} else if (env.FORCE_COLOR === 'false') {
+		forceColor = 0;
+	} else {
+		forceColor = env.FORCE_COLOR.length === 0 ? 1 : Math.min(parseInt(env.FORCE_COLOR, 10), 3);
+	}
 }
 
 function translateLevel(level) {
@@ -6686,8 +6733,8 @@ function translateLevel(level) {
 	};
 }
 
-function supportsColor(stream) {
-	if (forceColor === false) {
+function supportsColor(haveStream, streamIsTTY) {
+	if (forceColor === 0) {
 		return 0;
 	}
 
@@ -6701,22 +6748,21 @@ function supportsColor(stream) {
 		return 2;
 	}
 
-	if (stream && !stream.isTTY && forceColor !== true) {
+	if (haveStream && !streamIsTTY && forceColor === undefined) {
 		return 0;
 	}
 
-	const min = forceColor ? 1 : 0;
+	const min = forceColor || 0;
+
+	if (env.TERM === 'dumb') {
+		return min;
+	}
 
 	if (process.platform === 'win32') {
-		// Node.js 7.5.0 is the first version of Node.js to include a patch to
-		// libuv that enables 256 color output on Windows. Anything earlier and it
-		// won't work. However, here we target Node.js 8 at minimum as it is an LTS
-		// release, and Node.js 7 is not. Windows 10 build 10586 is the first Windows
-		// release that supports 256 colors. Windows 10 build 14931 is the first release
-		// that supports 16m/TrueColor.
+		// Windows 10 build 10586 is the first Windows release that supports 256 colors.
+		// Windows 10 build 14931 is the first release that supports 16m/TrueColor.
 		const osRelease = os.release().split('.');
 		if (
-			Number(process.versions.node.split('.')[0]) >= 8 &&
 			Number(osRelease[0]) >= 10 &&
 			Number(osRelease[2]) >= 10586
 		) {
@@ -6727,7 +6773,7 @@ function supportsColor(stream) {
 	}
 
 	if ('CI' in env) {
-		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
+		if (['TRAVIS', 'CIRCLECI', 'APPVEYOR', 'GITLAB_CI', 'GITHUB_ACTIONS', 'BUILDKITE'].some(sign => sign in env) || env.CI_NAME === 'codeship') {
 			return 1;
 		}
 
@@ -6766,22 +6812,18 @@ function supportsColor(stream) {
 		return 1;
 	}
 
-	if (env.TERM === 'dumb') {
-		return min;
-	}
-
 	return min;
 }
 
 function getSupportLevel(stream) {
-	const level = supportsColor(stream);
+	const level = supportsColor(stream, stream && stream.isTTY);
 	return translateLevel(level);
 }
 
 module.exports = {
 	supportsColor: getSupportLevel,
-	stdout: getSupportLevel(process.stdout),
-	stderr: getSupportLevel(process.stderr)
+	stdout: translateLevel(supportsColor(true, tty.isatty(1))),
+	stderr: translateLevel(supportsColor(true, tty.isatty(2)))
 };
 
 
