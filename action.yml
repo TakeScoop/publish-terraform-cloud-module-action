@@ -1,5 +1,5 @@
 name: Publish Terraform Cloud Module Action
-description: This action creates a new private module in Terraform Cloud with a VCS connection to the current repository, if one does not already exist
+description: Publishes a private module to a Terraform Cloud repository
 author: takescoop
 inputs:
   repo:
