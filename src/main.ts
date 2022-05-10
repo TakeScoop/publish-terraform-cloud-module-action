@@ -19,7 +19,7 @@ async function run(): Promise<void> {
     )
 
     core.setOutput('module', JSON.stringify(module))
-  } catch (err) {
+  } catch (err: any) {
     core.setFailed(err)
   }
 }
