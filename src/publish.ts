@@ -1,5 +1,6 @@
 import * as terraform from './lib/terraform'
 import * as core from '@actions/core'
+import axios from 'axios'
 import {URL} from 'url'
 
 export interface PublishOptions {
@@ -133,7 +134,10 @@ export async function publish(
         `Module "${mod.attributes.name}" from repository "${repo}" was published.`
       )
     } catch (err) {
-      core.error(JSON.stringify(err.response.data))
+      if axios.isAxiosError(err)
+        core.error(JSON.stringify(err.response.data))
+      }
+
       throw err
     }
   } else {
